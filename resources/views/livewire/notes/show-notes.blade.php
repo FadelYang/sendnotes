@@ -1,8 +1,16 @@
 <?php
 
 use Livewire\Volt\Component;
+use App\Models\Note;
 
 new class extends Component {
+    public function delete($noteId)
+    {
+        $note = Note::where('id', $noteId)->first();
+        $this->authorize('delete', $note);
+        $note->delete();
+    }
+
     public function with(): array
     {
         return [
@@ -29,7 +37,7 @@ new class extends Component {
                     <x-card wire:key='{{ $note->id }}'>
                         <div class="flex justify-between">
                             <div>
-                                <a href="#" class="text-xl font-bold hover:underline hover:text-blue-500">
+                                <a href="{{ route('note.edit', $note) }}" wire:navigate class="text-xl font-bold hover:underline hover:text-blue-500">
                                     {{ $note->title }}
                                 </a>
                                 <p>{{ Str::limit($note->body, 50) }}</p>
@@ -42,10 +50,9 @@ new class extends Component {
                             <p class="text-xs">Recipient: <span class="font-semibold">{{ $note->recipient }}</span></p>
                             <div>
                                 <x-button icon="eye" secondary></x-button.circle>
-                                    <x-button icon="trash"></x-button.circle>
+                                <x-button icon="trash" wire:click="delete('{{ $note->id }}')"></x-button.circle>
                             </div>
                         </div>
-
                     </x-card>
                 @endforeach
             </div>
